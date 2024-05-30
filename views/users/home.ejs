@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Your Job - Home</title>
+   <link rel="stylesheet" href="userAsset/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <img src="logo.png" alt="Logo">
+        <h1>Find Your Job</h1>
+        <a href="/login" class="login-btn">Login</a>
+    </header>
+    <div class="content-container">
+        <nav class="nav">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Jobs</a></li>
+                <li><a href="#">Companies</a></li>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="main-content">
+            <h2>Welcome to Find Your Job</h2>
+            <p class="description">
+                Find Your Job is your go-to platform for discovering job opportunities that match your skills and preferences. 
+                Whether you're a recent graduate or a seasoned professional, we help you find the right job faster.
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function showLoginSuccess() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Login Successful',
+                text: 'Welcome back!',
+                confirmButtonText: 'OK'
+            });
+        }
+    </script>
+</body>
+</html>
