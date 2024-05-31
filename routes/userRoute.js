@@ -13,7 +13,7 @@ userRoute.get('/',userController.loadHome)
 userRoute.get('/login',userController.loadLogin)
 userRoute.get('/register',userController.loadRegister)
 userRoute.post('/registerUser',userController.registerUser)
-
+userRoute.post('/verifyOtp',userController.verifyOtp)
 
 
 module.exports = userRoute

@@ -85,14 +85,80 @@
                 password:password
             }
             // If validation passes
-            fetch('/registerUser',{
-                method:'POST',
-                headers:{
-                    'Content-Type':'application/json',
+            // If validation passes
+// If validation passes
+fetch('/registerUser', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
+})
+.then(response => {
+    if (!response.ok) {
+        throw new Error(response.statusText);
+    }
+    return response.json();
+})
+.then(result => {
+    if (result.success) {
+        console.log("Registration successful");
+    } else {
+        Swal.fire('Error', 'Registration failed', 'error');
+    }
+})
+.catch(error => {
+    console.error('Registration error:', error);
+    Swal.fire('Error', 'There was an error with registration', 'error');
+});
+
+Otp(); // Open the OTP prompt immediately
+
+console.log("Registration request sent");
+
+function Otp() {
+    Swal.fire({
+        title: 'Enter OTP',
+        input: 'text',
+        inputLabel: 'OTP',
+        inputPlaceholder: 'Enter the OTP sent to your email',
+        showCancelButton: true,
+        confirmButtonText: 'Submit',
+        preConfirm: (otp) => {
+            console.log("OTP being submitted:", otp);
+            // Send OTP to the server for verification
+            return fetch('/verifyOtp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                body:JSON.stringify(data)
+                body: JSON.stringify({ otp })
             })
-            console.log("fjdn")
+            .then(response => {
+                console.log('OTP verification response:', response);
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('OTP verification result:', result);
+                if (result.success) {
+                    Swal.fire('Success', 'OTP verified successfully', 'success');
+                } else {
+                    Swal.fire('Error', 'Invalid OTP, please try again', 'error');
+                    setTimeout(Otp, 3000); // Re-show the OTP prompt after 3 seconds if verification fails
+                }
+            })
+            .catch(error => {
+                console.error('OTP verification error:', error);
+                Swal.fire('Error', 'Error verifying OTP, please try again', 'error');
+                setTimeout(Otp, 3000); // Re-show the OTP prompt after 3 seconds if an error occurs
+            });
+        }
+    });
+}
+
         }
     </script>
 </body>
