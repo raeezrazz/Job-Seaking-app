@@ -17,7 +17,7 @@
         <div class="form-container">
             <h2>Register</h2>
             <form onsubmit="handleRegister(event)">
-                <label for="name">Name</label>
+                <label style="margin: ;" for="name">Name</label>
                 <input type="text" id="name" name="name" required>
                 
                 <label for="email">Email</label>
@@ -111,19 +111,70 @@ fetch('/registerUser', {
     console.error('Registration error:', error);
     Swal.fire('Error', 'There was an error with registration', 'error');
 });
-
 Otp(); // Open the OTP prompt immediately
 
 console.log("Registration request sent");
 
+
+function startResendTimer(button) {
+    button.disabled = true;
+    let timer = 30000 / 1000;
+    button.textContent = `Resend OTP (${timer}s)`;
+    let resendTimeout = setInterval(() => {
+        timer--;
+        button.textContent = `Resend OTP (${timer}s)`;
+        if (timer <= 0) {
+            clearInterval(resendTimeout);
+            button.disabled = false;
+            button.textContent = 'Resend OTP';
+        }
+    }, 1000);
+}
+
 function Otp() {
     Swal.fire({
-        title: 'Enter OTP', 
+        title: 'Enter OTP',
         input: 'text',
         inputLabel: 'OTP',
-        inputPlaceholder: 'Enter the OTP sent to your email Address',
+        inputPlaceholder: 'Enter the OTP sent to your email address',
         showCancelButton: true,
         confirmButtonText: 'Submit',
+        didOpen: () => {
+            // Add the click event listener here since the button is dynamically inserted
+            const resendButton = Swal.getHtmlContainer().querySelector('#resend-otp');
+            if (resendButton) {
+                resendButton.addEventListener('click', () => {
+                    console.log("iiiiiiiiiiiiiiiiiiiiiii")
+                    otp()
+                    // Logic to resend OTP
+                    fetch('/resendOtp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(result => {
+                        if (result.success) {
+                            Swal.fire('Success', 'OTP resent successfully', 'success');
+                            startResendTimer(resendButton);
+                        } else {
+                            Swal.fire('Error', 'Failed to resend OTP', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('OTP resend error:', error);
+                        Swal.fire('Error', 'Error resending OTP, please try again', 'error');
+                    });
+                });
+            }
+        },
         preConfirm: (otp) => {
             console.log("OTP being submitted:", otp);
             // Send OTP to the server for verification
@@ -132,7 +183,7 @@ function Otp() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ otp })
+                body: JSON.stringify({ otp, data })
             })
             .then(response => {
                 console.log('OTP verification response:', response);
@@ -155,11 +206,22 @@ function Otp() {
                 Swal.fire('Error', 'Error verifying OTP, please try again', 'error');
                 setTimeout(Otp, 3000); // Re-show the OTP prompt after 3 seconds if an error occurs
             });
+        },
+        didRender: () => {
+            // Insert the resend button between cancel and confirm buttons
+            const resendButtonHTML = '<button id="resend-otp" class="swal2-confirm swal2-styled" style="background-color: #3085d6; margin: 0 5px;">Resend OTP</button>';
+            const cancelButton = Swal.getCancelButton();
+            cancelButton.insertAdjacentHTML('afterend', resendButtonHTML);
+            
+            // Start the timer after the button has been inserted
+            const resendButton = document.getElementById('resend-otp');
+            startResendTimer(resendButton);
         }
     });
 }
+}
 
-        }
+        
     </script>
 </body>
 </html>
